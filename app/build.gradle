@@ -1,0 +1,65 @@
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+}
+
+android {
+    compileSdk 31
+
+    defaultConfig {
+        applicationId "com.example.firebase_java"
+        minSdk 29
+        targetSdk 31
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    // ---------------------------------------------------------------------------------
+
+    // Import the BoM for the FirebaseManager platform
+    implementation platform('com.google.firebase:firebase-bom:28.4.2')
+
+    // Declare the dependency for the FirebaseManager Authentication library
+    // When using the BoM, you don't specify versions in FirebaseManager library dependencies
+    implementation 'com.google.firebase:firebase-auth'
+
+    // Also declare the dependency for the GoogleToken Play services library and specify its version
+    implementation 'com.google.android.gms:play-services-auth:19.2.0'
+
+    implementation 'com.firebaseui:firebase-ui-auth:5.0.0'
+
+    // Firebase核心
+    implementation 'com.google.firebase:firebase-core:16.0.6'
+    // FirebaseManager Authentication (帳號驗證模組)
+    implementation 'com.google.firebase:firebase-auth:16.1.0'
+    // Facebook軟體開發套件
+    implementation 'com.facebook.android:facebook-android-sdk:8+'
+
+    // DB
+    // Declare the dependency for the Cloud Firestore library
+    // When using the BoM, you don't specify versions in FirebaseManager library dependencies
+    implementation 'com.google.firebase:firebase-firestore'
+}
