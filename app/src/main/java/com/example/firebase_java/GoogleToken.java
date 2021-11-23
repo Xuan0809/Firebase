@@ -15,11 +15,9 @@ public class GoogleToken {
         return mToken;
     }
 
-    public AuthCredential handleFacebookAccessToken(String idToken) {
+    public void handleGoogleAccessToken(String idToken) {
         Log.d("TAG", "handleFacebookAccessToken:" + idToken);
 
         mToken = GoogleAuthProvider.getCredential(idToken, null);
-
-        return mToken;
     }
 }

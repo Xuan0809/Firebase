@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseManager mFirebaseManager = new FirebaseManager();
 
     TextView mtxtUserName, mtxtUserEmail;
+    Button mLogoutButton;
 
     // for requestCode
     int RC_SIGN_IN = 0;
@@ -47,6 +48,26 @@ public class MainActivity extends AppCompatActivity {
 
         mtxtUserName = findViewById(R.id.textView);
         mtxtUserEmail = findViewById(R.id.textView2);
+        mLogoutButton = findViewById(R.id.button);
+
+        mLogoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseManager.getFirebaseAuth().getInstance().signOut();
+
+                Log.e("TAG", String.valueOf(FirebaseManager.getFirebaseAuth().getInstance().getCurrentUser()));
+                if (FirebaseManager.getFirebaseAuth().getInstance().getCurrentUser() == null){
+                    Log.e("TAG","Already Logout");
+
+                    mtxtUserName.setText("Logout");
+                    mtxtUserEmail.setText("Logout");
+                }
+
+//                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                startActivity(intent);
+            }
+        });
 
         // Initialize FacebookToken Login button
         LoginButton loginButton = findViewById(R.id.login_button);
@@ -112,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         // Pass the activity result back to the FacebookToken SDK
-        FirebaseManager.getCallbackManager().onActivityResult(requestCode, resultCode, data);
+//        FirebaseManager.getCallbackManager().onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
@@ -121,6 +142,9 @@ public class MainActivity extends AppCompatActivity {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 Log.d("TAG", "firebaseAuthWithGoogle:" + account.getId());
+                // Set Token
+                FirebaseManager.getGoogleLogin().handleGoogleAccessToken(account.getIdToken());
+
                 GoogleSignIn();
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
@@ -146,25 +170,6 @@ public class MainActivity extends AppCompatActivity {
                             // If sign in fails
                             Log.d("TAG", "currentUser : null");
 
-                        }
-                    }
-                });
-    }
-
-    private void GoogleSignIn() {
-        FirebaseManager.getFirebaseAuth().signInWithCredential(GoogleToken.getToken())
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("TAG", "signInWithCredential:success");
-                            FirebaseManager.getFirebase().setFirebaseUser(FirebaseManager.getFirebaseAuth().getCurrentUser());
-
-                            updateUI();
-                        } else {
-                            // If sign in fails
-                            Log.d("TAG", "currentUser : null");
                         }
                     }
                 });
@@ -209,5 +214,32 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    private void GoogleSignIn() {
+        FirebaseManager.getFirebaseAuth().signInWithCredential(GoogleToken.getToken())
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("TAG", "signInWithCredential:success");
+                            FirebaseManager.getFirebase().setFirebaseUser(FirebaseManager.getFirebaseAuth().getCurrentUser());
 
+                            GoogleUpdateUI();
+                        } else {
+                            // If sign in fails
+                            Log.d("TAG", "currentUser : null");
+                        }
+                    }
+                });
+    }
+
+    private void GoogleUpdateUI() {
+
+        mtxtUserName.setText(FirebaseManager.getFirebaseUser().getDisplayName());
+        Log.d("Info", "UserName : $FirebaseManager.getFirebaseUser().getDisplayName()");
+
+        mtxtUserEmail.setText(FirebaseManager.getFirebaseUser().getEmail());
+        Log.d("Info", "UserEmail : $FirebaseManager.getFirebaseUser().getEmail()");
+
+    }
 }

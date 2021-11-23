@@ -21,4 +21,8 @@ Google part with Firebase :
 1.至 https://console.firebase.google.com/ 建立 Firebase 帳戶 , 並建立專案 ( 經過 FB 階段已建立好)
   -> Sign-in providers Enable : Google 
 
+2.至 Firebase : Project settings / Your Apps : Android apps
+  針對專案新增 SHA certificate fingerprints key
+
+3.根據 https://firebase.google.com/docs/auth/android/google-signin 新增 ref & implementation
 
