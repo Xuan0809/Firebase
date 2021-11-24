@@ -17,7 +17,6 @@ FB part with Firebase :
 
 ** Note : 11/23 5 pm ~ 11/24 10.30 am 發生 token 失效 無法登入問題 , google 各解決方式無效
 
-
 Google part with Firebase :
 
 1.至 https://console.firebase.google.com/ 建立 Firebase 帳戶 , 並建立專案 ( 經過 FB 階段已建立好)
@@ -31,6 +30,7 @@ Google part with Firebase :
 Function part :
 
 FB : LoginButton OnClick : Ask Token -> if Token != null -> FacebookSignIn()
+
 Google : LoginButton OnClick : GoogleRegister() -> ( onActivityResult ) if requestCode same 
          -> Ask Token ->  -> if Token != null -> GoogleSignIn()
 

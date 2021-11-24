@@ -25,21 +25,30 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView mtxtUserName, mtxtUserEmail;
-    Button mLogoutButton , mFBLoginButton , mGoogleLogIn ;
+    Button mLogoutButton, mFBLoginButton, mGoogleLogIn;
 
     // Google requestCode
     GoogleSignInClient mGoogleSignInClient;
     int RC_SIGN_IN = 0;
+
+    FireStore mFirStore = new FireStore();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseManager.getFirebaseAuth().getInstance().signOut();
 
                 Log.e("TAG", String.valueOf(FirebaseManager.getFirebaseAuth().getInstance().getCurrentUser()));
-                if (FirebaseManager.getFirebaseAuth().getInstance().getCurrentUser() == null){
-                    Log.e("TAG","Already Logout");
+                if (FirebaseManager.getFirebaseAuth().getInstance().getCurrentUser() == null) {
+                    Log.e("TAG", "Already Logout");
 
                     mtxtUserName.setText("Logout");
                     mtxtUserEmail.setText("Logout");
@@ -75,27 +84,27 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize FacebookToken Login button
         LoginManager.getInstance().registerCallback(FirebaseManager.getCallbackManager(), new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        Log.e("TAG", "facebook:onSuccess:" + loginResult);
-                        FirebaseManager.getFacebookToken().handleFacebookAccessToken(loginResult.getAccessToken());
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.e("TAG", "facebook:onSuccess:" + loginResult);
+                FirebaseManager.getFacebookToken().handleFacebookAccessToken(loginResult.getAccessToken());
 
-                        // get token
-                        if (FirebaseManager.getFacebookToken().getToken() != null) {
-                            FacebookSignIn(FirebaseManager.getFacebookToken().getToken());
-                        }
-                    }
+                // get token
+                if (FirebaseManager.getFacebookToken().getToken() != null) {
+                    FacebookSignIn(FirebaseManager.getFacebookToken().getToken());
+                }
+            }
 
-                    @Override
-                    public void onCancel() {
-                        Log.e("TAG", "facebook:onCancel");
-                    }
+            @Override
+            public void onCancel() {
+                Log.e("TAG", "facebook:onCancel");
+            }
 
-                    @Override
-                    public void onError(FacebookException exception) {
-                        Log.e("TAG", "facebook:onError", exception);
-                    }
-                });
+            @Override
+            public void onError(FacebookException exception) {
+                Log.e("TAG", "facebook:onError", exception);
+            }
+        });
 
 
         mFBLoginButton.setOnClickListener(new View.OnClickListener() {
@@ -125,6 +134,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
+        mFirStore.initDB();
+
+        mFirStore.SearchData();
     }
 
     @Override
@@ -134,7 +147,9 @@ public class MainActivity extends AppCompatActivity {
         if (FirebaseManager.getFirebase().CheckLogin() == true) {
             Log.d("TAG", "Already get User Login");
 
-            updateUI();
+            if (FirebaseManager.getFirebaseUser().isEmailVerified() == true) {
+                updateUI();
+            }
         }
     }
 
@@ -175,9 +190,26 @@ public class MainActivity extends AppCompatActivity {
                             // Sign in success
                             FirebaseManager.getFirebase().setFirebaseUser(FirebaseManager.getFirebaseAuth().getCurrentUser());
 
-                            FirebaseManager.getFirebase().CheckLogin();
+                            Log.e("TAG", "Email :" + String.valueOf(FirebaseManager.getFirebaseUser().isEmailVerified()));
+                            if (FirebaseManager.getFirebaseUser().isEmailVerified() == false) {
+                                Log.e("TAG", "Email unVerified");
+                                FirebaseManager.getFirebaseUser().sendEmailVerification()
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Log.d("TAG", "Email sent.");
+                                                }
+                                            }
+                                        });
+                            } else if (FirebaseManager.getFirebaseUser().isEmailVerified() == true) {
+                                Log.e("TAG", "Email Verified = true");
 
-                            updateUI();
+                                FirebaseManager.getFirebase().CheckLogin();
+
+                                updateUI();
+                            }
+
                             Log.e("TAG", "currentUser : " + FirebaseManager.getFirebaseUser());
 
                         } else {
@@ -232,11 +264,27 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("TAG", "signInWithCredential:success");
+
                             FirebaseManager.getFirebase().setFirebaseUser(FirebaseManager.getFirebaseAuth().getCurrentUser());
 
-                            FirebaseManager.getFirebase().CheckLogin();
+                            if (FirebaseManager.getFirebaseUser().isEmailVerified() == false) {
+                                Log.e("TAG", "Email unVerified");
+                                FirebaseManager.getFirebaseUser().sendEmailVerification()
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Log.d("TAG", "Email sent.");
+                                                }
+                                            }
+                                        });
+                            } else if (FirebaseManager.getFirebaseUser().isEmailVerified() == true) {
+                                Log.e("TAG", "Email Verified = true");
 
-                            updateUI();
+                                FirebaseManager.getFirebase().CheckLogin();
+
+                                updateUI();
+                            }
                         } else {
                             // If sign in fails
                             Log.d("TAG", "currentUser : null");

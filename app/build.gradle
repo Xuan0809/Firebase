@@ -62,4 +62,7 @@ dependencies {
     // Declare the dependency for the Cloud Firestore library
     // When using the BoM, you don't specify versions in FirebaseManager library dependencies
     implementation 'com.google.firebase:firebase-firestore'
+
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:29.0.0')
 }
