@@ -16,6 +16,7 @@ import com.facebook.AccessTokenTracker;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -29,10 +30,12 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity {
 
     TextView mtxtUserName, mtxtUserEmail;
-    Button mLogoutButton ;
+    Button mLogoutButton , mFBLoginButton , mGoogleLogIn ;
 
     // Google requestCode
     GoogleSignInClient mGoogleSignInClient;
@@ -48,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
 
         mtxtUserName = findViewById(R.id.textView);
         mtxtUserEmail = findViewById(R.id.textView2);
-        mLogoutButton = findViewById(R.id.button);
+        mLogoutButton = findViewById(R.id.logout_bt);
+        mFBLoginButton = findViewById(R.id.fb_sign_in);
 
         mLogoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,36 +73,41 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         // Initialize FacebookToken Login button
-        LoginButton loginButton = findViewById(R.id.login_button);
-        loginButton.setReadPermissions("email", "public_profile");
-        loginButton.registerCallback(FirebaseManager.getCallbackManager(), new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.e("TAG", "facebook:onSuccess:" + loginResult);
-                FirebaseManager.getFacebookToken().handleFacebookAccessToken(loginResult.getAccessToken());
+        LoginManager.getInstance().registerCallback(FirebaseManager.getCallbackManager(), new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        Log.e("TAG", "facebook:onSuccess:" + loginResult);
+                        FirebaseManager.getFacebookToken().handleFacebookAccessToken(loginResult.getAccessToken());
 
-                // get token
-                if (FirebaseManager.getFacebookToken().getToken() != null) {
-                    FacebookSignIn(FirebaseManager.getFacebookToken().getToken());
-                }
-            }
+                        // get token
+                        if (FirebaseManager.getFacebookToken().getToken() != null) {
+                            FacebookSignIn(FirebaseManager.getFacebookToken().getToken());
+                        }
+                    }
 
-            @Override
-            public void onCancel() {
-                Log.e("TAG", "facebook:onCancel");
-            }
+                    @Override
+                    public void onCancel() {
+                        Log.e("TAG", "facebook:onCancel");
+                    }
 
+                    @Override
+                    public void onError(FacebookException exception) {
+                        Log.e("TAG", "facebook:onError", exception);
+                    }
+                });
+
+
+        mFBLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onError(FacebookException error) {
-                Log.e("TAG", "facebook:onError", error);
+            public void onClick(View view) {
+                LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("public_profile", "email"));
             }
         });
 
         // init google Login button
-        com.google.android.gms.common.SignInButton GoogleLogIn = findViewById(R.id.sign_in_button);
-        GoogleLogIn.setOnClickListener(new View.OnClickListener() {
+        mGoogleLogIn = findViewById(R.id.google_sign_in);
+        mGoogleLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 GoogleRegister();
