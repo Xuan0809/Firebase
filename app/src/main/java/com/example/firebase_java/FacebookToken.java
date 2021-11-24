@@ -13,18 +13,15 @@ import com.google.firebase.auth.FacebookAuthProvider;
 
 public class FacebookToken {
 
-    private static AuthCredential mToken;
+    private static AuthCredential mFBToken;
 
     public static AuthCredential getToken() {
-        return mToken;
+        return mFBToken;
     }
 
-    public AuthCredential handleFacebookAccessToken(AccessToken token) {
+    public void handleFacebookAccessToken(AccessToken token) {
         Log.d("TAG", "handleFacebookAccessToken:" + token);
 
-        mToken = FacebookAuthProvider.getCredential(token.getToken());
-
-        return mToken;
-
+        mFBToken = FacebookAuthProvider.getCredential(token.getToken());
     }
 }

@@ -31,7 +31,7 @@ public class FirebaseManager {
 
     // Facebook Token Class
     private static FacebookToken mFacebookToken = null;
-    public static FacebookToken getFacebookLogin() {
+    public static FacebookToken getFacebookToken() {
         return mFacebookToken;
     }
 
@@ -43,7 +43,7 @@ public class FirebaseManager {
 
     // GoogleToken Class
     private static GoogleToken mGoogleToken = null;
-    public static GoogleToken getGoogleLogin() {
+    public static GoogleToken getGoogleToken() {
         return mGoogleToken;
     }
 
@@ -77,7 +77,7 @@ public class FirebaseManager {
             if (mAuth.getCurrentUser() != null) {
                 mFirebaseUser = (mAuth.getCurrentUser());
 
-                Log.e("TAG", "Print User : " + mFirebaseUser);
+                Log.e("TAG", "Print User : " + mFirebaseUser.getDisplayName());
 
                 mSignFlag = true;
             }
@@ -90,7 +90,7 @@ public class FirebaseManager {
         mSignFlag = false;
     }
 
-    // or use GetSignFlag();
+    // or use getSignFlag();
     public boolean IsSign() {
         return mSignFlag;
     }

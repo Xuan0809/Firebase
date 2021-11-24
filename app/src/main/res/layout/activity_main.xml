@@ -50,10 +50,9 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logout"
+        android:text="GoogleLogout"
         app:layout_constraintTop_toBottomOf="@+id/sign_in_button"
         app:layout_constraintStart_toStartOf="parent"/>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

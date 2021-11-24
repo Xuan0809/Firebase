@@ -2,10 +2,9 @@
     <string name="app_name">Firebase_Java</string>
 
     // ----------------------------------------------------------------------------
-    <string name="facebook_app_id">948160519432737</string>
-    <string name="fb_login_protocol_scheme">fb948160519432737</string>
-
+    <string name="facebook_app_id">450055873207104</string>
+    <string name="fb_login_protocol_scheme">fb450055873207104</string>
 
     <!--供Firebase第三方登入畫面模組使用-->
-    <string name="facebook_application_id">948160519432737</string>
+    <string name="facebook_application_id">450055873207104</string>
 </resources>

@@ -15,6 +15,8 @@ FB part with Firebase :
   至 values.string 加入 "FBID"
   至 manifests 加入 FB 登入詢問畫面
 
+** Note : 11/23 5 pm ~ 11/24 10.30 am 發生 token 失效 無法登入問題 , google 各解決方式無效
+
 
 Google part with Firebase :
 
@@ -25,4 +27,10 @@ Google part with Firebase :
   針對專案新增 SHA certificate fingerprints key
 
 3.根據 https://firebase.google.com/docs/auth/android/google-signin 新增 ref & implementation
+
+Function part :
+
+FB : LoginButton OnClick : Ask Token -> if Token != null -> FacebookSignIn()
+Google : LoginButton OnClick : GoogleRegister() -> ( onActivityResult ) if requestCode same 
+         -> Ask Token ->  -> if Token != null -> GoogleSignIn()
 
