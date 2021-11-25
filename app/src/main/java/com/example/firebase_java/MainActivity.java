@@ -42,13 +42,13 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     TextView mtxtUserName, mtxtUserEmail;
-    Button mLogoutButton, mFBLoginButton, mGoogleLogIn;
+    Button mLogoutButton, mFBLoginButton, mGoogleLogIn , mResetPassword , mAccountRegister;
 
     // Google requestCode
     GoogleSignInClient mGoogleSignInClient;
     int RC_SIGN_IN = 0;
 
-    FireStore mFirStore = new FireStore();
+    FireStore mFireStore = new FireStore();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
         mtxtUserEmail = findViewById(R.id.textView2);
         mLogoutButton = findViewById(R.id.logout_bt);
         mFBLoginButton = findViewById(R.id.fb_sign_in);
+        mResetPassword = findViewById(R.id.reset_bt);
+        mAccountRegister = findViewById(R.id.register_bt);
 
         mLogoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,6 +116,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mResetPassword.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                FirebaseManager.getFirebase().ResetPassword(FirebaseManager.getFirebaseUser().getEmail());
+            }
+        });
+
+        mAccountRegister.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                FirebaseManager.getFirebase().AccountRegister("sam@luffydesign.com","000000");
+            }
+        });
+
         // init google Login button
         mGoogleLogIn = findViewById(R.id.google_sign_in);
         mGoogleLogIn.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
                 if (currentAccessToken == null) {
-                    Log.d("TAG", "onLogout catched");
+                    Log.d("TAG", "Logout");
                     FirebaseManager.getFirebase().SignOut();
 
                     updateUI();//This is my code
@@ -135,9 +151,22 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        mFirStore.initDB();
+        mFireStore.initDB();
 
-        mFirStore.SearchData();
+        String TestCollection = "users";
+        String TestDocument = "profile";
+        mFireStore.InsertData(TestCollection,TestDocument);
+
+        mFireStore.SearchData(TestCollection);
+
+        mFireStore.UpdateData(TestCollection,TestDocument);
+
+        mFireStore.SearchDataFromDoc(TestCollection,TestDocument);
+
+//        mFireStore.deleteData(TestCollection,TestDocument);
+
+        hideSystemUI();
+        hideSystemUIcheck();
     }
 
     @Override
@@ -193,15 +222,9 @@ public class MainActivity extends AppCompatActivity {
                             Log.e("TAG", "Email :" + String.valueOf(FirebaseManager.getFirebaseUser().isEmailVerified()));
                             if (FirebaseManager.getFirebaseUser().isEmailVerified() == false) {
                                 Log.e("TAG", "Email unVerified");
-                                FirebaseManager.getFirebaseUser().sendEmailVerification()
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    Log.d("TAG", "Email sent.");
-                                                }
-                                            }
-                                        });
+
+                                FirebaseManager.getFirebase().EmailVerify();
+
                             } else if (FirebaseManager.getFirebaseUser().isEmailVerified() == true) {
                                 Log.e("TAG", "Email Verified = true");
 
@@ -269,15 +292,9 @@ public class MainActivity extends AppCompatActivity {
 
                             if (FirebaseManager.getFirebaseUser().isEmailVerified() == false) {
                                 Log.e("TAG", "Email unVerified");
-                                FirebaseManager.getFirebaseUser().sendEmailVerification()
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    Log.d("TAG", "Email sent.");
-                                                }
-                                            }
-                                        });
+
+                                FirebaseManager.getFirebase().EmailVerify();
+
                             } else if (FirebaseManager.getFirebaseUser().isEmailVerified() == true) {
                                 Log.e("TAG", "Email Verified = true");
 
@@ -291,5 +308,49 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void hideSystemUIcheck() {
+        View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener
+                (new View.OnSystemUiVisibilityChangeListener() {
+                    @Override
+                    public void onSystemUiVisibilityChange(int visibility) {
+                        // Note that system bars will only be "visible" if none of the
+                        // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
+                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                            // TODO: The system bars are visible. Make any desired
+                            // adjustments to your UI, such as showing the action bar or
+                            // other navigational controls.
+                            hideSystemUI();
+                            Log.d("test", "handleMessage: hide");
+                        } else {
+
+                            // TODO: The system bars are NOT visible. Make any desired
+                            // adjustments to your UI, such as hiding the action bar or
+                            // other navigational controls.
+
+                        }
+                    }
+                });
+    }
+
+    private void hideSystemUI() {
+        // Enables regular immersive mode.
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        // Set the content to appear under the system bars so that the
+                        // content doesn't resize when the system bars hide and show.
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        // Hide the nav bar and status bar
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+
+
     }
 }

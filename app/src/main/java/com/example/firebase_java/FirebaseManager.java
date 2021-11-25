@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.facebook.CallbackManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -59,7 +60,6 @@ public class FirebaseManager {
 
     // Init
     public static void FireBaseRegister() {
-
         // Initialize FacebookToken Login button
         mCallbackManager = CallbackManager.Factory.create();
 
@@ -97,5 +97,44 @@ public class FirebaseManager {
     // or use getSignFlag();
     public boolean IsSign() {
         return mSignFlag;
+    }
+
+    public void ResetPassword(String useremail){
+        mAuth.getInstance().sendPasswordResetEmail(useremail)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("TAG", "Email sent.");
+                        }
+                    }
+                });
+    }
+
+    public void EmailVerify(){
+        mFirebaseUser.sendEmailVerification()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("TAG", "Email sent.");
+                        }
+                    }
+                });
+    }
+
+    public void AccountRegister(String email,String password){
+        mAuth.createUserWithEmailAndPassword(email,password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Log.d("TAG", "Register already");
+                } else {
+                    Log.d("TAG", "Register error :" + task.toString());
+
+                }
+            }
+        });
     }
 }
